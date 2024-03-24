@@ -157,19 +157,16 @@ app.frame("/prepare-img", async (c) => {
 						"linear-gradient(to right, #334d2e, #598556, #3b5738)",
 					height: "100%",
 					width: "100%",
-					padding: "20px",
+					padding: "30px",
 				}}
 			>
 				<p style={{ whiteSpace: "normal" }}>
-					Cooking up your {state.base} {state.pasta} with{" "}
-					{state.topping1} and {state.topping2} pesto.
-					<br />
-					<br />
+					Ready to cook your {state.base} {state.pasta} with{" "}
+					{state.topping1} and {state.topping2} pesto?
 				</p>
-				<p>Check the status to see if it's ready to mint!</p>
 			</div>
 		),
-		intents: [<Button value="refresh">Status Check</Button>],
+		intents: [<Button value="refresh">Create Image</Button>],
 	});
 });
 
@@ -202,8 +199,6 @@ app.frame("/refresh-img", async (c) => {
 				ipfsGatewayUrl as State["ipfsGatewayUrl"];
 		});
 
-		console.log("refresh: we got here");
-
 		return c.res({
 			action: "/mint-successful",
 			image: (
@@ -225,14 +220,29 @@ app.frame("/refresh-img", async (c) => {
 		return c.res({
 			action: "/refresh-img",
 			image: (
-				<div style={{ color: "white", display: "flex", fontSize: 60 }}>
-					<p>
-						Check status for your {state.base} {state.pasta} with{" "}
-						{state.topping1} and {state.topping2} pesto:
+				<div
+					style={{
+						color: "white",
+						display: "flex",
+						flexWrap: "wrap",
+						fontSize: 55,
+						background:
+							"linear-gradient(to right, #334d2e, #598556, #3b5738)",
+						height: "100%",
+						width: "100%",
+						padding: "30px",
+					}}
+				>
+					<p style={{ whiteSpace: "normal" }}>
+						Cooking up your {state.base} {state.pasta} with{" "}
+						{state.topping1} and {state.topping2} pesto.
+						<br />
+						<br />
 					</p>
+					<p>Check the status to see if it's ready to mint!</p>
 				</div>
 			),
-			intents: [<Button value="refresh">Refresh</Button>],
+			intents: [<Button value="refresh">Status Check</Button>],
 		});
 	}
 });

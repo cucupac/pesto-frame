@@ -117,7 +117,6 @@ app.frame("/choose-topping2", (c) => {
 app.use("/prepare-img", fdk.analyticsMiddleware({ frameId: "prepare-img" }));
 
 app.frame("/prepare-img", async (c) => {
-	console.log("prepare: we got here");
 	const { buttonValue, deriveState } = c;
 	let state = await deriveState(async (previousState) => {
 		previousState.topping2 = buttonValue as State["topping2"];
@@ -176,17 +175,13 @@ app.frame("/refresh-img", async (c) => {
 	const { deriveState } = c;
 	const state = deriveState((previousState) => {});
 
-	// marvin: query /api/img/get
-	// const {status, openAiUrl} = {status: "ready", openAiUrl: "https://oaidalleapiprodscus.blob.core.windows.net/private/org-QlV7bUj9CtoUf8UgTXPLL1JH/user-6prQk9LVzsOlvxHfrTfKpMQA/img-7UzFV3o2ity5lwWyityOBbEO.png?st=2024-03-24T06%3A52%3A38Z&se=2024-03-24T08%3A52%3A38Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2024-03-23T21%3A16%3A17Z&ske=2024-03-24T21%3A16%3A17Z&sks=b&skv=2021-08-06&sig=iaIFBZT9Tj8dM9avGxopIk9urT2/b2HKYdRr1/H7q7g%3D"}
 	const url = getBaseUrl() + "api/image/query-job?jobId=" + state.openAiJobId;
 	const response = await fetch(url);
 
 	const { status, openAiUrl } = await response.json();
 	if (status === "ready") {
 		// get ipfs uri and gateway url using pinata fdk
-		const ipfsGatewayUrl = await fdk.convertUrlToIPFS(
-			"https://oaidalleapiprodscus.blob.core.windows.net/private/org-QlV7bUj9CtoUf8UgTXPLL1JH/user-6prQk9LVzsOlvxHfrTfKpMQA/img-PCVqd79Hy8f27N8bLKYrEwFX.png?st=2024-03-24T08%3A03%3A00Z&se=2024-03-24T10%3A03%3A00Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2024-03-23T21%3A49%3A22Z&ske=2024-03-24T21%3A49%3A22Z&sks=b&skv=2021-08-06&sig=12de%2Bkw3qyyO9qR82OiwsVhmmMgikOjP/j9zsFC1Jrc%3D"
-		);
+		const ipfsGatewayUrl = await fdk.convertUrlToIPFS(openAiUrl);
 		const cid = ipfsGatewayUrl!.split("/ipfs/")[1];
 		const ipfsUri = `ipfs://${cid}`;
 
@@ -201,15 +196,7 @@ app.frame("/refresh-img", async (c) => {
 
 		return c.res({
 			action: "/mint-successful",
-			image: (
-				<div style={{ color: "white", display: "flex", fontSize: 60 }}>
-					<p>
-						{ipfsUri}: Mint your {state.base} {state.pasta} with{" "}
-						{state.topping1} and {state.topping2} pesto:
-					</p>
-					<p>Image: {ipfsUri}</p>
-				</div>
-			),
+			image: ipfsGatewayUrl || "default-image-url",
 			intents: [
 				<Button.Transaction target={`/mint/${cid}`}>
 					Mint
@@ -256,8 +243,6 @@ app.frame("/mint-successful", (c) => {
 	const { deriveState } = c;
 	const state = deriveState((previousState) => {});
 
-	console.log("mint-successful - got here.");
-
 	return c.res({
 		image: state.ipfsGatewayUrl || "default-image-url",
 		imageAspectRatio: "1:1",
@@ -265,13 +250,9 @@ app.frame("/mint-successful", (c) => {
 });
 
 app.transaction("/mint/:cid", (c) => {
-	console.log("/mint/:cid - got here.");
-
 	// Access the path parameter
 	const cid = c.req.param("cid");
 	const ipfsUri = `ipfs://${cid}`;
-
-	console.log("[/mint/:cid]: ipfsUri: ", ipfsUri);
 
 	// Call contract with IPFS URI as paramater
 	return c.contract({

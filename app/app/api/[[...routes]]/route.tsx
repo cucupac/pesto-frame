@@ -246,6 +246,11 @@ app.frame("/mint-successful", (c) => {
 	return c.res({
 		image: state.ipfsGatewayUrl || "default-image-url",
 		imageAspectRatio: "1:1",
+		intents: [
+			<span style={{ color: "green", fontWeight: "bold" }}>
+				Mint was successful!
+			</span>,
+		],
 	});
 });
 

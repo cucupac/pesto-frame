@@ -242,14 +242,17 @@ app.use(
 app.frame("/mint-successful", (c) => {
 	const { deriveState } = c;
 	const state = deriveState((previousState) => {});
+	const { transactionId } = c;
 
 	return c.res({
 		image: state.ipfsGatewayUrl || "default-image-url",
 		imageAspectRatio: "1:1",
 		intents: [
-			<span style={{ color: "green", fontWeight: "bold" }}>
-				Mint was successful!
-			</span>,
+			<Button.Link
+				href={`https://sepolia.basescan.org/tx/${transactionId}`}
+			>
+				View in BaseScan
+			</Button.Link>,
 		],
 	});
 });
